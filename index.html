@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#f3efe6">
+<title>慢慢收 · 收一件，开一朵花</title>
+<style>
+  :root{
+    --paper: oklch(96.8% 0.014 88);
+    --paper-2: oklch(99.2% 0.006 88);
+    --ink: oklch(24% 0.018 75);
+    --ink-soft: oklch(42% 0.018 75);
+    --ink-faint: oklch(58% 0.014 75);
+    --green: oklch(52% 0.082 156);
+    --green-deep: oklch(40% 0.085 156);
+    --green-wash: oklch(93% 0.038 156);
+    --pink: oklch(70% 0.11 12);
+    --pink-wash: oklch(95% 0.03 12);
+    --line: oklch(88% 0.012 88);
+    --serif: 'Songti SC','STSong','Source Han Serif SC','Noto Serif SC',Georgia,serif;
+    --sans: -apple-system,system-ui,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;
+    --shadow: 0 4px 16px oklch(27% 0.02 75 / .08), 0 16px 40px oklch(27% 0.02 75 / .07);
+    --ease: cubic-bezier(.16,1,.3,1);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:var(--sans);color:var(--ink);font-size:23px;line-height:1.8;
+    background:
+      radial-gradient(130% 65% at 92% -8%, var(--green-wash) 0%, transparent 46%),
+      radial-gradient(120% 60% at 0% 5%, var(--pink-wash) 0%, transparent 40%),
+      var(--paper);
+    background-attachment:fixed;-webkit-font-smoothing:antialiased;min-height:100vh;
+  }
+  ::selection{background:var(--green);color:#fff}
+  .wrap{max-width:760px;margin:0 auto;padding:0 22px 90px}
+
+  /* 顶部：小花进度 */
+  header{position:sticky;top:0;z-index:9;background:oklch(96.8% 0.014 88 / .92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .htop{max-width:760px;margin:0 auto;padding:15px 22px;display:flex;align-items:center;gap:12px}
+  .htop b{font-family:var(--serif);font-size:24px;font-weight:600;letter-spacing:.04em}
+  .hflowers{margin-left:auto;font-size:21px;letter-spacing:1px;line-height:1}
+  .hflowers .got{filter:none}
+  .hflowers .miss{opacity:.28;filter:grayscale(1)}
+
+  /* 欢迎 */
+  .hi{padding:clamp(38px,7vw,64px) 0 8px;text-align:center}
+  .hi h1{font-family:var(--serif);font-weight:600;font-size:clamp(2.5rem,1.7rem+4vw,3.9rem);line-height:1.25;margin-bottom:18px}
+  .hi h1 em{font-style:normal;color:var(--green-deep)}
+  .hi .sub{font-size:clamp(1.2rem,1.05rem+1vw,1.45rem);color:var(--ink-soft);max-width:22ch;margin:0 auto;line-height:1.7}
+
+  /* 小花园 */
+  .garden{margin:30px auto 6px;background:var(--paper-2);border:1px solid var(--line);border-radius:24px;padding:26px 22px 22px;box-shadow:var(--shadow);text-align:center;max-width:560px}
+  .garden .gtitle{font-size:1.15rem;color:var(--ink-faint);margin-bottom:16px}
+  .garden .gtitle b{color:var(--green-deep);font-size:1.3rem}
+  .pots{display:grid;grid-template-columns:repeat(8,1fr);gap:8px;max-width:420px;margin:0 auto}
+  .pot{aspect-ratio:1;display:grid;place-items:center;font-size:clamp(26px,7vw,34px);border-radius:14px;background:var(--green-wash);line-height:1}
+  .pot.empty{background:oklch(94% 0.008 88);color:var(--ink-faint);font-size:18px}
+  .pot.pop{animation:bloom .6s var(--ease)}
+  @keyframes bloom{0%{transform:scale(.2);opacity:0}60%{transform:scale(1.25)}100%{transform:scale(1)}}
+
+  /* 大引导按钮 */
+  .cta{margin:30px auto 0;text-align:center}
+  .bigbtn{
+    font-family:var(--sans);font-size:1.45rem;font-weight:700;cursor:pointer;border:none;
+    background:var(--green-deep);color:#fff;padding:24px 40px;border-radius:99px;box-shadow:var(--shadow);
+    transition:transform .25s var(--ease);width:100%;max-width:480px;
+  }
+  .bigbtn:hover,.bigbtn:active{transform:translateY(-2px)}
+  .point{margin-top:18px;font-size:1.15rem;color:var(--ink-faint)}
+
+  .lead{text-align:center;margin:46px 0 18px;font-size:1.15rem;color:var(--ink-faint)}
+
+  /* 八件事列表 */
+  .list{display:flex;flex-direction:column;gap:15px}
+  .row{display:flex;align-items:center;gap:18px;background:var(--paper-2);border:1px solid var(--line);border-radius:22px;padding:22px 24px;cursor:pointer;box-shadow:0 2px 8px oklch(27% 0.02 75 / .04);transition:transform .28s var(--ease),box-shadow .28s var(--ease),border-color .28s}
+  .row:hover,.row:active{transform:translateY(-3px);box-shadow:var(--shadow);border-color:oklch(82% 0.045 156)}
+  .dot{width:56px;height:56px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;background:var(--green-wash);font-family:var(--serif);font-size:25px;font-weight:600;color:var(--green-deep);line-height:1}
+  .row.done .dot{background:transparent;font-size:34px}
+  .rt{flex:1;min-width:0}
+  .rt b{display:block;font-size:1.35rem;font-weight:600;line-height:1.45}
+  .rt small{display:block;color:var(--ink-faint);font-size:1.05rem;margin-top:2px}
+  .row.done .rt b{color:var(--ink-faint)}
+  .chev{color:var(--green);font-size:32px;flex-shrink:0;line-height:1}
+
+  .foot{text-align:center;margin-top:56px;color:var(--ink-faint);font-size:1.1rem;line-height:1.9}
+  .reset{background:none;border:none;color:var(--ink-faint);font-size:1rem;text-decoration:underline;cursor:pointer;font-family:var(--sans)}
+  .reset:hover{color:var(--pink)}
+
+  /* 阅读页 */
+  #read{display:none}
+  .rnav{padding:24px 0 6px;display:flex;align-items:center;gap:12px}
+  .back{font-family:var(--sans);font-size:1.2rem;color:var(--ink-soft);background:none;border:none;cursor:pointer}
+  .back:hover{color:var(--green-deep)}
+  .rcount{margin-left:auto;color:var(--ink-faint);font-size:1.1rem;font-variant-numeric:tabular-nums}
+  .card{background:var(--paper-2);border:1px solid var(--line);border-radius:28px;padding:clamp(30px,5vw,50px);box-shadow:var(--shadow);margin-top:6px}
+  .card .no{font-family:var(--serif);font-size:1.15rem;color:var(--green);letter-spacing:.08em}
+  .card h2{font-family:var(--serif);font-weight:600;font-size:clamp(2rem,1.5rem+2.6vw,2.9rem);line-height:1.3;margin:12px 0 24px}
+  .card p{font-size:clamp(1.25rem,1.1rem+.7vw,1.5rem);line-height:1.9;color:oklch(30% 0.018 75);margin-bottom:18px}
+  .card p strong{color:var(--ink);background:linear-gradient(transparent 58%,var(--green-wash) 58%)}
+  .do{margin-top:26px;background:var(--green-wash);border:1px solid oklch(86% 0.05 156);border-radius:20px;padding:24px}
+  .do .lab{font-size:1.1rem;font-weight:700;color:var(--green-deep);margin-bottom:6px}
+  .do p{margin:0;font-size:1.32rem;color:oklch(27% 0.05 156)}
+
+  .reward{
+    margin-top:28px;text-align:center;border-radius:20px;padding:0;max-height:0;overflow:hidden;opacity:0;
+    transition:max-height .5s var(--ease),opacity .4s,padding .5s var(--ease);background:var(--pink-wash);border:1px solid transparent;
+  }
+  .reward.show{max-height:260px;opacity:1;padding:26px 22px;border-color:oklch(90% 0.04 12)}
+  .reward .big{font-size:60px;line-height:1;animation:bloom .6s var(--ease)}
+  .reward .msg{margin-top:12px;font-size:1.3rem;color:oklch(40% 0.08 12);font-weight:600}
+
+  .donebtn{
+    margin-top:28px;width:100%;font-family:var(--sans);font-size:1.4rem;font-weight:700;cursor:pointer;
+    border:2.5px solid var(--green);color:var(--green-deep);background:transparent;padding:24px;border-radius:20px;
+    display:flex;align-items:center;justify-content:center;gap:10px;transition:.25s var(--ease);
+  }
+  .donebtn:hover{background:var(--green-wash)}
+  .donebtn.on{background:var(--green-deep);border-color:var(--green-deep);color:#fff}
+  .nextbig{
+    margin-top:14px;width:100%;font-family:var(--sans);font-size:1.3rem;font-weight:600;cursor:pointer;
+    border:none;background:var(--pink);color:#fff;padding:22px;border-radius:20px;display:none;
+    align-items:center;justify-content:center;gap:8px;transition:transform .2s var(--ease);
+  }
+  .nextbig:hover{transform:translateY(-2px)}
+  .nextbig.show{display:flex}
+  .pg{display:flex;gap:14px;margin-top:16px}
+  .pgb{flex:1;background:var(--paper-2);border:1px solid var(--line);border-radius:18px;padding:18px;cursor:pointer;font-family:var(--sans);color:var(--ink);font-size:1.1rem;transition:.25s var(--ease)}
+  .pgb:hover{border-color:var(--green);transform:translateY(-2px)}
+  .pgb:disabled{opacity:.35;cursor:default;transform:none}
+  .pgb small{display:block;color:var(--ink-faint);font-size:.95rem;margin-bottom:3px}
+  .pgb b{font-weight:600;font-size:1.12rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+  .pgb.n{text-align:right}
+
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="htop" onclick="home()" style="cursor:pointer">
+    <b>慢慢收</b>
+    <div class="hflowers" id="hf"></div>
+  </div>
+</header>
+
+<div class="wrap" id="homeView">
+  <section class="hi">
+    <h1>收一件，<br><em>开一朵花</em> 🌸</h1>
+    <p class="sub">不用一次收完。今天收一件小事，就开一朵花。</p>
+  </section>
+
+  <div class="garden">
+    <div class="gtitle">你已经收到 <b id="gcount">0</b> 朵小花</div>
+    <div class="pots" id="pots"></div>
+  </div>
+
+  <div class="cta">
+    <button class="bigbtn" id="startBtn" onclick="startNext()">今天，从这一件开始 →</button>
+    <div class="point" id="pointTxt">↑ 点这个大绿按钮，我带你做第一件</div>
+  </div>
+
+  <p class="lead">— 或者，点下面任意一件看看 —</p>
+  <div class="list" id="list"></div>
+
+  <div class="foot">
+    收到哪算哪，今天没做完也很好，明天再来。<br>
+    <button class="reset" onclick="reset()">全部重来</button>
+  </div>
+</div>
+
+<div class="wrap" id="read">
+  <div class="rnav">
+    <button class="back" onclick="home()">← 回到首页</button>
+    <span class="rcount" id="rc"></span>
+  </div>
+  <div class="card" id="card"></div>
+  <button class="nextbig" id="nextBig">看下一件 →</button>
+  <div class="pg" id="pg"></div>
+</div>
+
+<script>
+const FLOWERS = ['🌸','🌼','🌷','🌻','🌺','🪷','🌹','💐'];
+const TIPS = [
+  { t:'今天只收一个小地方',
+    hint:'挑一个小角落就好',
+    body:`<p>不用想着把整个家一次收完——那样太累，也容易放弃。</p>
+    <p><strong>今天只挑一个小地方</strong>：一个抽屉、一张桌子、一个角落，把它收好，今天就够了。明天再收下一个。</p>`,
+    do:'选一个你最看不顺眼的小地方，今天只收它一个。' },
+  { t:'先把一眼就是垃圾的扔掉',
+    hint:'不用动脑子的先做',
+    body:`<p>别一上来就跟舍不得的东西较劲，那样很容易就停下了。</p>
+    <p>先扔<strong>一眼就知道没用的</strong>：空盒子、坏了的、过期的、重复的。扔着扔着，就空出一大块地方了。</p>`,
+    do:'拿一个垃圾袋，只装「一看就是垃圾」的东西，装满为止。' },
+  { t:'三个袋子，拿起来就分',
+    hint:'留下 · 送人 · 扔掉',
+    body:`<p>准备三个袋子或纸箱，分别是：<strong>留下、送人、扔掉</strong>。</p>
+    <p>拿起一样东西，马上放进其中一个。<strong>不许放一边说「以后再说」</strong>——一犹豫，就又乱了。</p>`,
+    do:'找一个台面，用这三个袋子把它清空。' },
+  { t:'一年没用过，基本就不会用了',
+    hint:'拿不准时这样想',
+    body:`<p>遇到拿不准要不要留的东西，问自己一句话：</p>
+    <p><strong>「这一年，我用过它吗？」</strong>一年都没碰过，以后用上的机会也很小。放手，把地方留给真正在用的东西。</p>`,
+    do:'找一样一年没用过的东西，把它送走或捐掉。' },
+  { t:'每样东西，给它一个固定的家',
+    hint:'用完放回去就不乱',
+    body:`<p>家里会乱，常常是因为东西没有固定的地方放。</p>
+    <p>钥匙、药、剪刀、遥控器……<strong>每样东西都给它定一个固定位置</strong>，用完就放回去。东西有家，家就乱不起来。</p>`,
+    do:'挑一样老是找不到的东西，今天给它定一个固定的地方。' },
+  { t:'进一件，出一件',
+    hint:'东西才不会越攒越多',
+    body:`<p>收拾干净之后，最怕又慢慢堆回来。</p>
+    <p>记住一句话：<strong>买进来一件新的，就送走一件旧的。</strong>这样总量不会越来越多，地方一直够用。</p>`,
+    do:'想想最近买的一样东西，送走家里同类的一件旧的。' },
+  { t:'一次只收十分钟就停',
+    hint:'不累，才能一直做下去',
+    body:`<p>不用逼自己一口气收完，那样太累，做一次就不想再做。</p>
+    <p><strong>定个十分钟，时间一到就停下来休息。</strong>每天收一点点，攒起来很惊人，而且一点都不累。</p>`,
+    do:'现在定一个十分钟的闹钟，收一下，响了就歇着。' },
+  { t:'收不完，是很正常的',
+    hint:'别跟自己过不去',
+    body:`<p>没有谁能一下子收得完美，反复、偶尔乱回去，都很正常。</p>
+    <p>不用追求完美。<strong>今天比昨天清爽一点点，就已经很好了。</strong>慢慢来，你一直在变好。</p>`,
+    do:'夸自己一句「今天做得不错」，明天再收一点。' },
+];
+const MSG = [
+  '第一朵开了！你已经迈出第一步啦 🌱',
+  '又一朵～ 慢慢来，不着急。',
+  '三朵花了，家里也清爽了一点点。',
+  '一半啦！你看，没那么难吧。',
+  '第五朵～ 你做得真好。',
+  '快啦，就剩两件了，加油。',
+  '只差最后一朵了！',
+  '满园都开啦 🌷🌸🌼 你把家也照顾好了，真棒！',
+];
+
+const KEY='mama-flowers-v2';
+let done=new Set(JSON.parse(localStorage.getItem(KEY)||'[]'));
+const save=()=>localStorage.setItem(KEY,JSON.stringify([...done]));
+
+function renderFlowers(popIdx){
+  // 顶部小花
+  document.getElementById('hf').innerHTML=FLOWERS.map((f,i)=>
+    `<span class="${done.has(i)?'got':'miss'}">${done.has(i)?f:'🌸'}</span>`).join('');
+  // 花园格子
+  document.getElementById('pots').innerHTML=FLOWERS.map((f,i)=>
+    done.has(i)?`<div class="pot ${i===popIdx?'pop':''}">${f}</div>`:`<div class="pot empty">·</div>`).join('');
+  document.getElementById('gcount').textContent=done.size;
+  // 大按钮文字
+  const allDone=done.size===TIPS.length;
+  const sb=document.getElementById('startBtn'), pt=document.getElementById('pointTxt');
+  if(allDone){sb.textContent='八件都收完啦 🌸 再看看';pt.textContent='你真的很棒，明天保持就好';}
+  else if(done.size===0){sb.textContent='今天，从这一件开始 →';pt.textContent='↑ 点这个大绿按钮，我带你做第一件';}
+  else{sb.textContent='接着收下一件 →';pt.textContent='↑ 点一下，继续收一朵花';}
+}
+function renderList(){
+  document.getElementById('list').innerHTML=TIPS.map((x,i)=>`
+    <div class="row ${done.has(i)?'done':''}" onclick="open1(${i})">
+      <div class="dot">${done.has(i)?FLOWERS[i]:(i+1)}</div>
+      <div class="rt"><b>${x.t}</b><small>${done.has(i)?'✓ 已经收过这朵花':x.hint}</small></div>
+      <div class="chev">›</div>
+    </div>`).join('');
+  renderFlowers();
+}
+function startNext(){
+  let i=TIPS.findIndex((_,k)=>!done.has(k));
+  if(i<0)i=0;
+  open1(i);
+}
+function open1(i){
+  const x=TIPS[i],on=done.has(i);
+  document.getElementById('card').innerHTML=`
+    <div class="no">第 ${i+1} 件 · 共 8 件</div>
+    <h2>${x.t}</h2>
+    ${x.body}
+    <div class="do"><div class="lab">↳ 今天就做这个</div><p>${x.do}</p></div>
+    <div class="reward" id="rw"></div>
+    <button class="donebtn ${on?'on':''}" id="db" onclick="toggle(${i})">
+      <span style="font-size:1.5rem">${on?FLOWERS[i]:'🌸'}</span>
+      <span id="dbt">${on?'这朵花收到啦 · 点一下取消':'做好了，收一朵小花'}</span>
+    </button>`;
+  const nb=document.getElementById('nextBig');
+  const next=i<TIPS.length-1;
+  nb.className='nextbig';
+  nb.textContent=next?'看下一件 →':'回首页看小花园 🌸';
+  nb.onclick=()=>{ next?open1(i+1):home(); };
+  if(on)nb.classList.add('show');
+  const prev=i>0;
+  document.getElementById('pg').innerHTML=`
+    <button class="pgb" ${prev?'':'disabled'} onclick="${prev?`open1(${i-1})`:''}"><small>上一件</small><b>${prev?TIPS[i-1].t:'已是第一件'}</b></button>
+    <button class="pgb n" ${next?'':'disabled'} onclick="${next?`open1(${i+1})`:''}"><small>下一件</small><b>${next?TIPS[i+1].t:'最后一件'}</b></button>`;
+  document.getElementById('rc').textContent='第 '+(i+1)+' / 8 件';
+  document.getElementById('homeView').style.display='none';
+  document.getElementById('read').style.display='block';
+  window.scrollTo(0,0);
+}
+function toggle(i){
+  const wasDone=done.has(i);
+  if(wasDone)done.delete(i);else done.add(i);
+  save();
+  const on=done.has(i);
+  const b=document.getElementById('db');
+  b.classList.toggle('on',on);
+  b.querySelector('span').textContent=on?FLOWERS[i]:'🌸';
+  document.getElementById('dbt').textContent=on?'这朵花收到啦 · 点一下取消':'做好了，收一朵小花';
+  const rw=document.getElementById('rw'), nb=document.getElementById('nextBig');
+  if(on){
+    rw.innerHTML=`<div class="big">${FLOWERS[i]}</div><div class="msg">${MSG[done.size-1]||'真好，又收获一朵小花 🌸'}</div>`;
+    rw.classList.add('show');
+    nb.classList.add('show');
+  }else{
+    rw.classList.remove('show');rw.innerHTML='';
+    nb.classList.remove('show');
+  }
+  renderFlowers(on?i:undefined);
+}
+function home(){document.getElementById('read').style.display='none';document.getElementById('homeView').style.display='block';renderList();window.scrollTo(0,0)}
+function reset(){if(confirm('把收到的小花都清空，重新开始吗？')){done=new Set();save();renderList()}}
+renderList();
+</script>
+</body>
+</html>
